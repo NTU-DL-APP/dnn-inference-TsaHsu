@@ -38,6 +38,14 @@ def nn_forward_h5(model_arch, weights, data):
                 x = softmax(x)
     return x
 
-# === 給評分系統用的介面 ===
+
 def nn_inference(model_arch, weights, data):
+    import numpy.lib.npyio
+    print("==> weights type:", type(weights))
+    
+    # 修正點：如果是 npz 檔回傳的 NpzFile 類別 → 轉成 list
+    if isinstance(weights, numpy.lib.npyio.NpzFile):
+        weights = [weights[k] for k in sorted(weights.files)]
+    
     return nn_forward_h5(model_arch, weights, data)
+
