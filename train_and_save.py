@@ -16,7 +16,7 @@ y_test = to_categorical(y_test)
 # ==== 模型建構 ====
 model = Sequential([
     Flatten(input_shape=(28, 28), name='flatten'),
-    Dense(256, activation='relu', name='dense_1'),  # 加大神經元數
+    Dense(256, activation='relu', name='dense_1'),
     Dense(10, activation='softmax', name='dense_2')
 ])
 
@@ -24,15 +24,17 @@ model = Sequential([
 model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=5, batch_size=64)  # 增加 epoch
 
-# ==== 儲存模型 ====
-model.save('model.h5')  # optional
+model.fit(x_train, y_train, epochs=5, batch_size=64)
 
-# 儲存權重
+# ==== 儲存模型（可選）====
+model.save('model.h5')  # 可忽略此檔
+
+# ==== 儲存權重 ====
 weights = model.get_weights()
 np.savez('fashion_mnist.npz', *weights)
 
-# 儲存模型架構（只存 layers 結構，符合自動評分器格式）
+# ==== 儲存模型結構（只保留非 InputLayer 的層）====
+layers = [layer for layer in model.get_config()['layers'] if layer['class_name'] != 'InputLayer']
 with open('fashion_mnist.json', 'w') as f:
-    json.dump(model.get_config()['layers'], f, indent=2)
+    json.dump(layers, f, indent=2)
